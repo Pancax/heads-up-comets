@@ -45,27 +45,28 @@ const username = ref(null);
 const password = ref(null);
 
 const login = async () => {
-  const data = await fetch('http://localhost:3000/create_user', {
+  // const data = await fetch('http://localhost:3000/create_user', {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  //   body: JSON.stringify({ user: username.value, pass: password.value }),
+  // });
+  // const status = data.status;
+  // if (status == 200) {
+
+  // }
+  const userRes = await fetch('http://localhost:3000/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ user: username.value, pass: password.value }),
   });
-  const status = data.status;
-  if (status == 200) {
-    const userRes = await fetch('http://localhost:3000/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ user: username.value, pass: password.value }),
-    });
-    const auth = await userRes.text();
-    if (auth) {
-      store.login(auth);
-      router.push({ path: '/', query: { user: username.value, auth: auth } });
-    }
+  const auth = await userRes.text();
+  if (auth) {
+    store.login(auth);
+    router.push({ path: '/', query: { user: username.value, auth: auth } });
   }
   username.value = null;
   password.value = null;
