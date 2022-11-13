@@ -12,7 +12,7 @@
   background-color: theme('colors.yellow.200');
 }
 .Warning {
-  background-color: theme('colors.orange.300');
+  background-color: theme('colors.red.500');
 }
 .Free {
   background-color: theme('colors.green.200');

@@ -2,7 +2,7 @@
   <div class="relative">
     <Feed :user="user" :events="events" @updateActiveEvent="updateActive_Event" />
     <Map :auth="auth" :events="events" />
-    <Event :active_event="active_event" />
+    <Event :user="user" :auth="auth" :active_event="active_event" />
     <div v-for="e of confirmations">
       <ConfirmBox
         :auth="auth"

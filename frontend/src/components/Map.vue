@@ -94,8 +94,20 @@ onMounted(async () => {
   });
 });
 
+const colors = {
+  Study: '#a5f3fc',
+  Social: '#d8b4fe',
+  Caution: '#fef08a',
+  Warning: '#ef4444',
+  Free: '#bbf7d0',
+  'Campus Org': '#bfdbfe',
+  Fun: '#c7d2fe',
+};
+
 const createCircle = (circle) => {
-  L.circleMarker(circle.location, { radius: circle.count * 5 * 3 }).addTo(mapDiv);
+  const circ = L.circleMarker(circle.location, { radius: circle.count * 8 * 3 });
+  const color = colors[circle.tags[0]];
+  circ.setStyle({ color: color }).addTo(mapDiv);
 };
 
 const createEvent = async () => {
