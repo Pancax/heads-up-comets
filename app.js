@@ -72,7 +72,7 @@ app.post('/create_user', async function (req, res, next) {
   let users = JSON.parse(fs.readFileSync('private/users.json'));
   same = 0;
   for (u of users) {
-    if ((u.username = user)) {
+    if (u.username == user) {
       same = 1;
     }
   }
@@ -231,35 +231,31 @@ app.post('/edit_event', function (req, res, next) {
   res.status(200).end();
 });
 
-app.get('/get_events',function(req,res,next){
-	let events = JSON.parse(fs.readFileSync("private/events.json"));
-	if(req.query.tags.length == 0){
-		res.status(200).json(events);
-		return;
-	}
+app.get('/get_events', function (req, res, next) {
+  let events = JSON.parse(fs.readFileSync('private/events.json'));
+  if (req.query.tags.length == 0) {
+    res.status(200).json(events);
+    return;
+  }
 
-	let addedE = []
-	for(let e of events){
-		for(tag of e.tags){
-			if(req.query.tags.includes(tag)){
-				addedE.push({
-					"id":e.id,
-					"owner":e.owner,
-					"location":e.location,
-					"tags":e.tags,
-					"context":e.context,
-					"count":e.count
-				});
-				break;
-			}
-			
-		}
-	}
+  let addedE = [];
+  for (let e of events) {
+    for (tag of e.tags) {
+      if (req.query.tags.includes(tag)) {
+        addedE.push({
+          id: e.id,
+          owner: e.owner,
+          location: e.location,
+          tags: e.tags,
+          context: e.context,
+          count: e.count,
+        });
+        break;
+      }
+    }
+  }
 
-	res.status(200).json(addedE);
-
-	
-
+  res.status(200).json(addedE);
 });
 
 app.get('/get_event', function (req, res, next) {
@@ -310,11 +306,11 @@ app.post('/create_post', function (req, res, next) {
 });
 
 function alert_client() {
-  io.emit('update');
+  io.emit('update', '');
 }
 
-server.listen(3000,function(){
-	console.log('listening on *:3000');
+server.listen(3000, function () {
+  console.log('listening on *:3000');
 });
 
 function send_out_confirm_events() {
