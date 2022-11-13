@@ -21,8 +21,6 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-
-
 //routes
 app.get('/',function(req,res){
 	res.status(200).sendFile(path.join(__dirname,'static/entry.html'));
@@ -38,16 +36,20 @@ app.post('/login',async function(req,res,next){
 	let users = JSON.parse(fs.readFileSync("private/users.json"));
 	for(u of users){
 		if(user == u.username){
-			if(pass = u.password){
+			if(pass == u.password){
 				let authString = Date.now();
 				authTokens.push({"username":user,"auth":""+authString,"socket": null});
 				console.log(user+" logged in.");
 				res.status(200).send(""+authString);
 				return;
 			}
+			else{
+				res.status(400).send("Incorrect Password.");
+				return;
+			}
 		}
 	}
-	res.status(400).end();
+	res.status(400).send("Username not found.");
 });
 
 app.post('/create_user',async function(req,res,next){
@@ -73,9 +75,9 @@ app.post('/create_user',async function(req,res,next){
 
 	if(same == 0){
 		users.push({"id":users.length,"username":user,"password":pass});
-		res.status(200).end();
+		res.status(200).send("User successfully created.");
 	}else{
-		res.status(400).end();
+		res.status(400).send("Username already exists.");
 	}
 	fs.writeFileSync("private/users.json",JSON.stringify(users));
 
