@@ -231,45 +231,35 @@ app.post('/edit_event', function (req, res, next) {
   res.status(200).end();
 });
 
-app.post('/edit_event', function (req, res, next) {
-  let user = user_for_auth(req.body.auth);
-  if (user == '') {
-    res.status(400).end();
-    return;
-  }
-  let events = JSON.parse(fs.readFileSync('private/events.json'));
+app.get('/get_events',function(req,res,next){
+	let events = JSON.parse(fs.readFileSync("private/events.json"));
+	if(req.query.tags.length == 0){
+		res.status(200).json(events);
+		return;
+	}
 
-  let index = 0;
-  let c = 0;
-  let oldEvent = null;
-  for (let e of events) {
-    if (e.id == req.body.event_id) {
-      if (e.owner != user) {
-        res.send(400).end();
-        return;
-      } else {
-        index = c;
-        oldEvent = e;
-      }
-    }
-    c++;
-  }
+	let addedE = []
+	for(let e of events){
+		for(tag of e.tags){
+			if(req.query.tags.includes(tag)){
+				addedE.push({
+					"id":e.id,
+					"owner":e.owner,
+					"location":e.location,
+					"tags":e.tags,
+					"context":e.context,
+					"count":e.count
+				});
+				break;
+			}
+			
+		}
+	}
 
-  events.splice(index, 1);
+	res.status(200).json(addedE);
 
-  let newEvent = {
-    id: oldEvent.id,
-    owner: oldEvent.owner,
-    location: req.body.location,
-    tags: req.body.tags,
-    context: req.body.context,
-    description: req.body.description,
-    count: oldEvent.count,
-    thread_id: oldEvent.thread_id,
-  };
-  events.push(newEvent);
-  fs.writeFileSync('private/events.json', JSON.stringify(events));
-  res.status(200).end();
+	
+
 });
 
 app.get('/get_event', function (req, res, next) {
@@ -322,6 +312,10 @@ app.post('/create_post', function (req, res, next) {
 function alert_client() {
   io.emit('update');
 }
+
+server.listen(3000,function(){
+	console.log('listening on *:3000');
+});
 
 function send_out_confirm_events() {
   let events = JSON.parse(fs.readFileSync('private/events.json'));
