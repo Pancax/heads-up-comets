@@ -1,13 +1,16 @@
 <script setup>
-import { onBeforeMount } from 'vue';
-import { useSocketStore } from '@/stores/socket.js';
+import { ref, onBeforeUnmount, onMounted } from 'vue';
+import { io } from 'socket.io-client';
 
-const store = useSocketStore();
-store.setup();
+const socket = ref(io('http://localhost:3000'));
 
-onBeforeMount(() => store.disconnect());
+onMounted(() => {
+  // socket.value.on('update', () => console.log('meow'));
+});
+
+onBeforeUnmount(() => socket.disconnect());
 </script>
 
 <template>
-  <RouterView />
+  <RouterView :socket="socket" />
 </template>

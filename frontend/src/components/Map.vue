@@ -1,6 +1,5 @@
 <template>
   <div class="relative w-full">
-    {{ events2 }}
     <div id="map" class="z-0 w-full h-screen"></div>
     <div
       :class="event_modal_toggle ? '' : 'opacity-0 -translate-y-[440px]'"
@@ -50,13 +49,17 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, computed, ref } from 'vue';
 import 'leaflet/dist/leaflet.css';
 import L, { map } from 'leaflet';
 
-const props = defineProps(['events2']);
+const props = defineProps({
+  auth: String,
+  events: Array,
+});
 
 let mapDiv;
+
 const context = ref(null);
 const tags = ref(null);
 const description = ref(null);
@@ -66,17 +69,24 @@ const event_modal_toggle = ref(false);
 
 const center = [32.986175387437946, -96.75014222885781];
 
-onMounted(() => {
-  mapDiv = L.map('map').setView(center, 16);
+onMounted(async () => {
+  const response = await fetch('http://localhost:3000/get_events?tags=', {
+    redirect: 'manual',
+  });
+  const events = await response.json();
+
+  mapDiv = L.map('map').setView(center, 15);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(mapDiv);
 
-  L.circleMarker([32.986175387437946, -96.75014222885781], { radius: 1 * 5 * 3 }).addTo(
-    mapDiv
-  );
+  mapDiv.setMaxBounds(mapDiv.getBounds());
+
+  for (let e of events) {
+    createCircle(e);
+  }
 
   mapDiv.on('click', (e) => {
     event_modal_toggle.value = true;
@@ -84,24 +94,37 @@ onMounted(() => {
   });
 });
 
-console.log(props['events2']);
-
-for (e in props.events2) {
-  L.circleMarker(e.latlng, { radius: e.count * 5 * 3 }).addTo(mapDiv);
-}
-
 const createCircle = (circle) => {
-  L.circleMarker(circle.latlng, { radius: circle.count * 5 * 3 }).addTo(mapDiv);
+  L.circleMarker(circle.location, { radius: circle.count * 5 * 3 }).addTo(mapDiv);
 };
 
-const createEvent = () => {
-  createCircle({ latlng: latlng.value, count: 1 });
-  console.log(latlng.value);
-  event_modal_toggle.value = false;
-  context.value = null;
-  tags.value = null;
-  description.value = null;
-  latlng.value = null;
+const createEvent = async () => {
+  const payload = {
+    auth: props['auth'],
+    location: latlng.value,
+    tags: tags.value.split(', '),
+    context: context.value,
+    description: description.value,
+  };
+  console.log(payload);
+  const res = await fetch('http://localhost:3000/create_event', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+  const status = res.status;
+  if (status == 200) {
+    createCircle({ location: latlng.value, count: 1 });
+    event_modal_toggle.value = false;
+    context.value = null;
+    tags.value = null;
+    description.value = null;
+    latlng.value = null;
+  } else {
+    alert('Error 400');
+  }
 };
 </script>
 

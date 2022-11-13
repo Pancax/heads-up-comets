@@ -1,5 +1,4 @@
 import { io } from 'socket.io-client';
-// import { useEventStore } from '@/stores/';
 
 class SocketioService {
   socket;
@@ -18,6 +17,12 @@ class SocketioService {
   disconnect() {
     if (this.socket) {
       this.socket.disconnect();
+    }
+  }
+
+  listen() {
+    if (this.socket) {
+      this.socket.on('update', () => console.log('MEOWMEOWMO'));
     }
   }
 }

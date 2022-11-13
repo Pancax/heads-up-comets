@@ -1,3 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.Study {
+  background-color: theme('colors.cyan.200');
+}
+.Social {
+  background-color: theme('colors.purple.300');
+}
+.Caution {
+  background-color: theme('colors.yellow.200');
+}
+.Warning {
+  background-color: theme('colors.orange.300');
+}
+.Free {
+  background-color: theme('colors.green.200');
+}
+.CampusOrg {
+  background-color: theme('colors.blue.200');
+}
+.Fun {
+  background-color: theme('colors.indigo.200');
+}
